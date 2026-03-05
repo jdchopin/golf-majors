@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⛳ Golf Draft</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;1,400&family=Source+Code+Pro:wght@400;600&family=Great+Vibes&display=swap');
+
+:root {
+  --bg:     #f5f2ec;
+  --surf:   #ffffff;
+  --surf2:  #eef0eb;
+  --bord:   rgba(45,138,73,0.18);
+  --green:  #2d8a49;
+  --green2: #1f6b38;
+  --gold:   #b8860b;
+  --gold2:  #8b6508;
+  --text:   #1a2e1f;
+  --muted:  #5a7a60;
+  --white:  #ffffff;
+  --red:    #c0392b;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Source Sans 3',sans-serif;min-height:100vh;}
+
+/* HEADER */
+header{
+  background:linear-gradient(90deg,#1f6b38,#2d8a49);
+  border-bottom:2px solid var(--gold2);
+  padding:12px 24px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:300;
+  gap:12px;flex-wrap:wrap;
+}
+.logo{font-family:'Oswald',sans-serif;font-size:1.5rem;letter-spacing:.08em;color:#f5f2ec;white-space:nowrap;}
+.logo em{color:#f0d080;font-style:normal;}
+.hdr-right{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+#hdrMeta{font-size:.74rem;color:rgba(255,255,255,.7);line-height:1.7;}
+#hdrMeta b{color:#f0d080;}
+#autoRefreshBadge{font-size:.72rem;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:4px 10px;color:#f0f7f2;display:none;align-items:center;gap:6px;}
+#autoRefreshBadge .dot{width:7px;height:7px;border-radius:50%;background:#f0f7f2;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+/* TOURNAMENT BANNER */
+.tournament-banner{
+  text-align:center;
+  padding:28px 20px 18px;
+  position:relative;
+}
+.tournament-banner::before{
+  content:'';
+  position:absolute;
+  left:50%;transform:translateX(-50%);
+  bottom:0;
+  width:320px;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold2),transparent);
+}
+#tournamentInput{
+  font-family:'Great Vibes',cursive;
+  font-size:3.2rem;
+  color:var(--green2);
+  background:transparent;
+  border:none;
+  border-bottom:2px dashed rgba(45,138,73,.25);
+  text-align:center;
+  outline:none;
+  width:100%;
+  max-width:700px;
+  padding:4px 12px 8px;
+  transition:border-color .2s,text-shadow .2s;
+  caret-color:var(--green);
+  letter-spacing:.02em;
+}
+#tournamentInput::placeholder{
+  color:rgba(45,138,73,.3);
+}
+#tournamentInput:focus{
+  border-bottom-color:var(--green);
+  border-bottom-style:solid;
+  text-shadow:0 0 30px rgba(45,138,73,.15);
+}
+.tournament-edit-hint{
+  font-size:.7rem;
+  color:var(--muted);
+  margin-top:6px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  opacity:.7;
+  transition:opacity .2s;
+}
+.tournament-banner:hover .tournament-edit-hint{opacity:1;}
+
+/* WRAP */
+.wrap{max-width:1500px;margin:0 auto;padding:20px 18px;}
+
+/* CARD */
+.card{background:var(--surf);border:1px solid var(--bord);border-radius:12px;padding:24px 28px;margin-bottom:22px;}
+.card-title{font-family:'Oswald',sans-serif;font-size:1.3rem;letter-spacing:.07em;color:var(--gold);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.card-title small{font-family:'Source Sans 3',sans-serif;font-size:.72rem;font-weight:400;color:var(--muted);letter-spacing:0;}
+
+/* FORM */
+.row{display:flex;gap:18px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px;}
+.f{display:flex;flex-direction:column;gap:5px;}
+.f label{font-size:.67rem;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--green);}
+.f input,.f select{background:#ffffff;border:1px solid var(--bord);border-radius:7px;padding:8px 12px;color:var(--text);font-family:'Source Sans 3',sans-serif;font-size:.9rem;outline:none;transition:border-color .18s,box-shadow .18s;}
+.f input:focus,.f select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(58,170,92,.1);}
+.f input[type=number]{width:95px;}
+.f input.wide{width:380px;max-width:100%;}
+.team-names-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+.tnf{display:flex;flex-direction:column;gap:4px;}
+.tnf label{font-size:.65rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+.tnf input{background:#ffffff;border:1px solid var(--bord);border-radius:6px;padding:7px 11px;color:var(--text);font-family:'Source Sans 3',sans-serif;font-size:.87rem;width:120px;outline:none;}
+.tnf input:focus{border-color:var(--green);}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:7px;border:none;font-family:'Source Sans 3',sans-serif;font-size:.86rem;font-weight:600;cursor:pointer;transition:all .17s;white-space:nowrap;letter-spacing:.04em;}
+.btn-gold{background:linear-gradient(135deg,var(--gold),#f0cc6e);color:#1a1000;}
+.btn-gold:hover{transform:translateY(-1px);box-shadow:0 4px 18px rgba(224,184,74,.35);}
+.btn-green{background:var(--green2);color:#fff;}
+.btn-green:hover{background:var(--green);color:#0b1a10;}
+.btn-outline{background:transparent;border:1px solid var(--bord);color:var(--green);}
+.btn-outline:hover{border-color:var(--green);background:rgba(58,170,92,.08);}
+.btn-google{background:#fff;color:#333;border:1px solid #ddd;gap:8px;}
+.btn-google:hover{background:#f5f5f5;box-shadow:0 2px 8px rgba(0,0,0,.15);}
+.btn-google img{width:18px;height:18px;}
+.btn-sm{padding:6px 13px;font-size:.77rem;}
+.btn-red{background:rgba(224,96,96,.15);border:1px solid rgba(224,96,96,.3);color:#e87572;}
+.btn-red:hover{background:rgba(224,96,96,.25);}
+.btn-row{display:flex;gap:9px;flex-wrap:wrap;align-items:center;}
+
+/* ALERTS */
+.info{background:rgba(224,184,74,.07);border:1px solid rgba(224,184,74,.22);border-radius:8px;padding:10px 15px;font-size:.81rem;color:var(--gold);margin-bottom:14px;line-height:1.65;}
+.info code{font-family:'Source Code Pro',monospace;font-size:.78rem;}
+.err{background:rgba(224,96,96,.1);border:1px solid rgba(224,96,96,.3);border-radius:8px;padding:10px 15px;font-size:.81rem;color:#e87572;margin-bottom:12px;}
+.ok{background:rgba(58,170,92,.1);border:1px solid rgba(58,170,92,.3);border-radius:8px;padding:10px 15px;font-size:.81rem;color:var(--green);margin-bottom:12px;}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(58,170,92,.2);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* STEPS */
+.steps{counter-reset:step;display:flex;flex-direction:column;gap:9px;margin-bottom:16px;}
+.step{display:flex;gap:13px;align-items:flex-start;padding:12px 15px;background:rgba(255,255,255,.025);border:1px solid var(--bord);border-radius:8px;}
+.step::before{counter-increment:step;content:counter(step);min-width:24px;height:24px;background:var(--green2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Oswald',sans-serif;font-size:.88rem;color:#fff;flex-shrink:0;margin-top:1px;}
+.step-body{font-size:.82rem;line-height:1.65;color:var(--text);}
+.step-body b{color:var(--gold);}
+.step-body code{font-family:'Source Code Pro',monospace;font-size:.76rem;background:rgba(0,0,0,.3);padding:2px 6px;border-radius:4px;color:var(--green);}
+
+/* SECTION TABS */
+.tabs{display:flex;gap:4px;background:rgba(0,0,0,.25);border-radius:9px;padding:4px;width:fit-content;margin-bottom:18px;}
+.tab{padding:7px 17px;border-radius:6px;border:none;background:transparent;color:var(--muted);font-family:'Source Sans 3',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .17s;}
+.tab.active{background:var(--green2);color:#fff;}
+
+/* TOOLBAR */
+.toolbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:15px;}
+.scoring-note{margin-left:auto;font-size:.75rem;color:var(--muted);background:var(--surf2);border:1px solid var(--bord);border-radius:6px;padding:5px 11px;}
+.scoring-note b{color:var(--gold);}
+#refreshTimer{font-size:.72rem;color:var(--muted);}
+
+/* ── ROSTER GRID (vertical columns side by side) ── */
+.roster-table-wrap{overflow-x:auto;}
+.roster-table{width:100%;border-collapse:collapse;table-layout:fixed;}
+.roster-table th{
+  padding:10px 12px;
+  font-family:'Oswald',sans-serif;font-size:.85rem;letter-spacing:.07em;
+  background:var(--surf2);border:1px solid var(--bord);
+  color:var(--gold);text-align:center;position:relative;
+}
+.roster-table th .pick-count{
+  display:block;font-family:'Source Sans 3',sans-serif;font-size:.65rem;
+  font-weight:400;color:var(--muted);letter-spacing:0;margin-top:2px;
+}
+.roster-table td{
+  padding:0;
+  border:1px solid rgba(80,180,100,.1);
+  vertical-align:top;
+}
+.slot-cell{
+  position:relative;
+  display:flex;align-items:center;
+  min-height:38px;
+  padding:0 6px 0 10px;
+}
+.slot-num{
+  font-family:'Source Code Pro',monospace;font-size:.7rem;
+  color:rgba(106,142,116,.5);min-width:18px;flex-shrink:0;
+}
+.slot-filled{
+  flex:1;display:flex;align-items:center;justify-content:space-between;gap:4px;
+  padding:6px 2px;
+}
+.slot-filled .slot-name{font-size:.82rem;color:var(--white);font-weight:500;line-height:1.2;}
+.slot-filled .slot-score{font-family:'Source Code Pro',monospace;font-size:.75rem;white-space:nowrap;}
+.slot-filled.counting .slot-name{color:var(--gold);}
+.slot-filled.counting{background:rgba(224,184,74,.05);}
+.slot-rm{background:none;border:none;color:rgba(106,142,116,.4);cursor:pointer;font-size:1rem;padding:0 2px;line-height:1;flex-shrink:0;transition:color .15s;}
+.slot-rm:hover{color:var(--red);}
+.slot-empty{flex:1;}
+
+/* search row at bottom of each column */
+.slot-search-wrap{position:relative;}
+.slot-search-wrap input{
+  width:100%;background:#f0f5f1;
+  border:none;border-top:1px solid var(--bord);
+  padding:8px 10px;color:var(--text);
+  font-family:'Source Sans 3',sans-serif;font-size:.82rem;
+  outline:none;transition:background .15s;
+}
+.slot-search-wrap input:focus{background:#dff0e6;}
+.slot-search-wrap input::placeholder{color:var(--muted);}
+.slot-search-wrap .autocomplete-dropdown{
+  position:absolute;bottom:100%;left:0;right:0;top:auto;
+  background:#ffffff;border:1px solid var(--green);
+  border-bottom:none;border-radius:7px 7px 0 0;
+  max-height:220px;overflow-y:auto;z-index:200;display:none;
+}
+.slot-search-wrap .autocomplete-dropdown.open{display:block;}
+.ac-item{padding:8px 12px;font-size:.83rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(45,138,73,.1);}
+.ac-item:hover,.ac-item.selected{background:rgba(45,138,73,.1);}
+.ac-item .ac-name{color:var(--text);}
+.ac-item .ac-score{font-family:'Source Code Pro',monospace;font-size:.78rem;}
+.ac-item.already-picked{opacity:.45;}
+.ac-item.already-picked .ac-name::after{content:' (drafted)';color:var(--muted);font-size:.75rem;}
+
+
+/* MAIN LEADERBOARD */
+.lb-grid{display:flex;flex-direction:column;gap:9px;}
+.lb-row{display:flex;align-items:stretch;background:var(--surf);border:1px solid var(--bord);border-radius:9px;overflow:hidden;transition:border-color .18s;}
+.lb-row.first{border-color:var(--gold);background:rgba(224,184,74,.07);}
+.lb-row:hover{border-color:var(--green);}
+.lb-rank{min-width:50px;display:flex;align-items:center;justify-content:center;background:var(--surf2);font-family:'Oswald',sans-serif;font-size:1.45rem;color:var(--muted);border-right:1px solid var(--bord);}
+.first .lb-rank{color:var(--gold);}
+.lb-body{flex:1;padding:11px 16px;display:flex;flex-direction:column;gap:3px;}
+.lb-name{font-family:'Oswald',sans-serif;font-size:1.05rem;letter-spacing:.05em;}
+.lb-players{font-size:.75rem;color:var(--muted);line-height:1.8;}
+.lb-players .cnt{color:var(--green);font-weight:600;}
+.lb-players .ncnt{color:var(--muted);text-decoration:line-through;text-decoration-color:rgba(106,142,116,.35);}
+.lb-score{min-width:85px;display:flex;align-items:center;justify-content:center;font-family:'Source Code Pro',monospace;font-size:1.4rem;font-weight:600;border-left:1px solid var(--bord);padding:0 16px;}
+
+/* RAW ESPN TABLE */
+#rawSection{margin-top:8px;}
+.raw-table-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--bord);margin-top:4px;}
+#rawTable{width:100%;border-collapse:collapse;font-size:.82rem;min-width:500px;}
+#rawTable thead tr{background:var(--surf2);border-bottom:2px solid var(--bord);}
+#rawTable th{padding:9px 13px;text-align:center;font-family:'Oswald',sans-serif;font-size:.7rem;letter-spacing:.1em;color:var(--muted);white-space:nowrap;border-right:1px solid var(--bord);}
+#rawTable th:first-child,#rawTable th:nth-child(2){text-align:left;}
+#rawTable tbody tr{border-bottom:1px solid rgba(80,180,100,.07);transition:background .12s;}
+#rawTable tbody tr:hover{background:rgba(58,170,92,.05);}
+#rawTable td{padding:8px 13px;text-align:center;border-right:1px solid rgba(80,180,100,.05);font-family:'Source Code Pro',monospace;font-size:.8rem;vertical-align:middle;}
+#rawTable td:first-child{color:var(--gold);font-weight:600;}
+#rawTable td:nth-child(2){text-align:left;font-family:'Source Sans 3',sans-serif;font-weight:600;color:var(--white);}
+.sc-under{color:#4ecb71;} .sc-over{color:#e06060;} .sc-even{color:var(--muted);} .sc-cut{color:var(--gold);font-size:.73rem;}
+.picked-indicator{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--gold);margin-left:6px;vertical-align:middle;title:attr(data-team);}
+
+/* SYNC STATUS */
+.sync-bar{display:flex;align-items:center;gap:8px;font-size:.76rem;color:var(--muted);padding:7px 12px;background:var(--surf2);border:1px solid var(--bord);border-radius:7px;margin-bottom:14px;}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--muted);}
+.sync-dot.synced{background:var(--green);}
+.sync-dot.syncing{background:var(--gold);animation:pulse 1s infinite;}
+.sync-dot.error{background:var(--red);}
+
+.divider{height:1px;background:var(--bord);margin:18px 0;}
+.hidden{display:none!important;}
+.collapse-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.8rem;padding:0;transition:color .15s;}
+.collapse-btn:hover{color:var(--gold);}
+
+/* Google sign-in area */
+.google-auth-area{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 16px;background:rgba(255,255,255,.03);border:1px solid var(--bord);border-radius:8px;margin-bottom:16px;}
+.google-user{display:flex;align-items:center;gap:8px;font-size:.84rem;}
+.google-avatar{width:28px;height:28px;border-radius:50%;border:2px solid var(--green);}
+
+@media(max-width:700px){
+  header{flex-direction:column;gap:8px;}
+  .f input.wide{width:100%;}
+  .draft-input-grid{grid-template-columns:1fr!important;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">⛳ Golf <em>Draft</em></div>
+  <div class="hdr-right">
+    <div id="autoRefreshBadge"><span class="dot"></span><span id="refreshCountdown">–</span></div>
+    <div id="hdrMeta">Configure below to get started</div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- TOURNAMENT BANNER -->
+<div class="tournament-banner">
+  <input type="text" id="tournamentInput" placeholder="Tournament Name" maxlength="80"
+    oninput="updateTournamentTitle()" />
+  <div class="tournament-edit-hint">✏️ click to edit</div>
+</div>
+
+<!-- ══════════════════════════════════════
+     DRAFT BOARD (shown above settings)
+══════════════════════════════════════ -->
+<div id="draftBoardSection" class="hidden">
+
+  <!-- TEAM ROSTER COLUMNS -->
+  <div class="card" id="draftCard">
+    <div class="card-title">🏌️ Draft Board
+      <small id="draftCardSub"></small>
+    </div>
+    <div id="syncBar" class="sync-bar hidden">
+      <div class="sync-dot" id="syncDot"></div>
+      <span id="syncMsg">Not connected to Google Sheets</span>
+    </div>
+    <div id="draftInputGrid"></div>
+  </div>
+
+  <!-- LEADERBOARD -->
+  <div class="card" id="lbCard">
+    <div class="card-title">🏆 Team Leaderboard</div>
+    <div class="toolbar">
+      <button class="btn btn-green btn-sm" onclick="doRefresh()">↺ Refresh Scores</button>
+      <button class="btn btn-outline btn-sm" onclick="clearAllPicks()">✕ Clear All Picks</button>
+      <div id="refreshTimer" class="hidden"></div>
+      <div class="scoring-note">Best <b id="bestNNote">4</b> scores count &nbsp;·&nbsp; Lowest total wins</div>
+    </div>
+    <div class="lb-grid" id="lbGrid"></div>
+  </div>
+
+  <!-- ESPN RAW TABLE -->
+  <div class="card" id="rawCard">
+    <div class="card-title" style="cursor:pointer;" onclick="toggleRaw()">
+      📋 Full ESPN Leaderboard
+      <button class="collapse-btn" id="rawToggleBtn" style="margin-left:auto;">▼ Hide</button>
+    </div>
+    <div id="rawSection">
+      <div style="font-size:.75rem;color:var(--muted);margin-bottom:10px;">
+        Last updated: <span id="lastUpdated">–</span> &nbsp;·&nbsp;
+        <span id="autoRefreshNote"></span>
+      </div>
+      <div class="raw-table-wrap">
+        <table id="rawTable">
+          <thead id="rawHead"></thead>
+          <tbody id="rawBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /draftBoardSection -->
+
+<!-- ══════════════════════════════════════
+     SECTION 1 — SETUP
+══════════════════════════════════════ -->
+<div class="card" id="setupCard">
+  <div class="card-title">⚙️ Draft Settings</div>
+  <div class="row">
+    <div class="f"><label>Teams</label><input type="number" id="numTeams" value="4" min="2" max="12" oninput="buildTeamInputs()"></div>
+    <div class="f"><label>Players / Team</label><input type="number" id="ppTeam" value="6" min="1" max="12"></div>
+    <div class="f"><label>Best N Scores Count</label><input type="number" id="bestN" value="4" min="1" max="12"></div>
+    <div class="f">
+      <label>Auto-Refresh Every</label>
+      <select id="refreshInterval">
+        <option value="0">Off</option>
+        <option value="60">1 min</option>
+        <option value="180">3 min</option>
+        <option value="300" selected>5 min</option>
+        <option value="600">10 min</option>
+      </select>
+    </div>
+  </div>
+  <div style="margin-bottom:7px;font-size:.67rem;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--green);">Team Names</div>
+  <div class="team-names-row" id="teamNamesRow"></div>
+  <div style="margin-top:10px;">
+    <button class="btn btn-gold" onclick="generateDraftBoard()" style="font-size:1rem;padding:12px 32px;letter-spacing:.07em;">
+      🏌️ Generate Draft Board
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SECTION 2 — GOOGLE SHEETS CONNECTION
+══════════════════════════════════════ -->
+<div class="card" id="sheetsCard">
+  <div class="card-title">📊 Google Sheets Connection
+    <small>— reads scores &amp; syncs picks via Apps Script</small>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-body">
+        In your Google Sheet click <b>Extensions → Apps Script</b>. Delete everything and paste the code from the <b>apps-script.js</b> file provided. Click <b>Save</b>.
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        Click <b>Deploy → New Deployment</b>. Set type to <b>Web App</b>, set <b>Execute as: Me</b> and <b>Who has access: Anyone</b>. Click Deploy and copy the Web App URL.
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        Paste the Web App URL below. That's it — no sign-in needed!
+      </div>
+    </div>
+  </div>
+
+  <div class="row" style="margin-bottom:10px;">
+    <div class="f" style="flex:1;">
+      <label>Apps Script Web App URL</label>
+      <input type="text" id="appsScriptUrl" class="wide" value="https://script.google.com/macros/s/AKfycby2YFMooz17ZY2tKgi75Q1zxeD5sqnBCYPp7hRKMewK45-rDjvozx2eOnm7GnZylHoTNA/exec">
+    </div>
+    <div class="f">
+      <label>&nbsp;</label>
+      <button class="btn btn-outline btn-sm" onclick="saveAppsScriptUrl()">Save URL</button>
+    </div>
+  </div>
+  <div id="scriptUrlOk" class="ok hidden"></div>
+  <div id="scriptUrlErr" class="err hidden"></div>
+
+  <div class="divider"></div>
+
+  <div class="row" style="margin-bottom:10px;">
+    <div class="f" style="flex:1;">
+      <label>Leaderboard CSV URL (published from Google Sheets)</label>
+      <input type="text" id="csvUrl" class="wide" value="https://docs.google.com/spreadsheets/d/e/2PACX-1vS23Flgx1Valn3tgOIGwywtYj1BF-1QTRar_hMbzvM2sqRfUcTg_sxwOW8To12354MAwVNX1w_Ps1Fw/pub?gid=793028028&single=true&output=csv">
+    </div>
+  </div>
+
+  <div class="btn-row" style="margin-bottom:10px;">
+    <button class="btn btn-gold" onclick="loadLeaderboard()">
+      <span id="loadTxt">⚡ Load Leaderboard</span>
+      <span id="loadSpin" class="spinner hidden"></span>
+    </button>
+    <button class="btn btn-outline" onclick="toggleManualInput()">✏️ Enter Manually Instead</button>
+  </div>
+  <div id="loadErr" class="err hidden"></div>
+  <div id="loadOk"  class="ok  hidden"></div>
+
+  <!-- MANUAL -->
+  <div id="manualBox" class="hidden" style="margin-top:14px;">
+    <div class="info">One per line: <b>Name, Score, Thru</b> &nbsp;·&nbsp; e.g. <code>Scottie Scheffler, -12, F</code></div>
+    <textarea id="manualText" style="width:100%;height:150px;background:#ffffff;border:1px solid var(--bord);border-radius:8px;padding:11px;color:var(--text);font-family:'Source Code Pro',monospace;font-size:.79rem;outline:none;resize:vertical;" placeholder="Scottie Scheffler, -12, F&#10;Rory McIlroy, -8, F&#10;Xander Schauffele, -5, 16"></textarea>
+    <button class="btn btn-green btn-sm" style="margin-top:8px;" onclick="loadManual()">Load</button>
+  </div>
+</div>
+
+<!-- RESET FOOTER -->
+<div style="text-align:center;padding:40px 20px 50px;">
+  <div style="display:inline-block;border:1px solid rgba(224,96,96,.2);border-radius:12px;padding:24px 36px;background:rgba(224,96,96,.04);">
+    <div style="font-family:'Oswald',sans-serif;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">New Tournament?</div>
+    <button class="btn btn-red" onclick="resetAll()" style="font-size:.95rem;padding:11px 28px;letter-spacing:.05em;">
+      🔄 Reset Draft Board
+    </button>
+    <div style="font-size:.72rem;color:var(--muted);margin-top:10px;line-height:1.6;">Clears all picks from the board and Google Sheets.<br>Leaderboard will reload from your sheet.</div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<script>
+/* ═══════════════════════════════════════
+   STATE
+═══════════════════════════════════════ */
+const S = {
+  players: [],
+  rawHeaders: [],
+  rawRows: [],
+  teams: [],
+  picks: {},
+  numTeams: 4,
+  ppTeam: 6,
+  bestN: 4,
+  lastCsvUrl: '',
+  appsScriptUrl: '',
+  preTournament: false,
+  refreshTimer: null,
+  refreshInterval: 300,
+  countdown: 0,
+};
+
+/* ═══════════════════════════════════════
+   INIT
+═══════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', async () => {
+  S.appsScriptUrl = 'https://script.google.com/macros/s/AKfycby2YFMooz17ZY2tKgi75Q1zxeD5sqnBCYPp7hRKMewK45-rDjvozx2eOnm7GnZylHoTNA/exec';
+
+  // Clear any stale localStorage — Google Sheets is the source of truth
+  localStorage.removeItem('golfDraft_settings');
+  localStorage.removeItem('golfDraft_appsScriptUrl');
+  localStorage.removeItem('golfDraft_csvUrl');
+  localStorage.removeItem('golfDraft_sheetId');
+
+  // Step 1: Load settings from Google Sheets
+  let cfg = null;
+  try {
+    const resp = await fetch(S.appsScriptUrl + '?action=getSettings');
+    const data = await resp.json();
+    if (data && data.numTeams) {
+      cfg = {
+        numTeams:   parseInt(data.numTeams) || 4,
+        ppTeam:     parseInt(data.ppTeam)   || 6,
+        bestN:      parseInt(data.bestN)    || 4,
+        teams:      JSON.parse(data.teams   || '[]'),
+        tournament: data.tournament || ''
+      };
+    }
+  } catch(e) { console.warn('Could not load settings from sheet:', e); }
+
+  if (cfg) {
+    S.numTeams = cfg.numTeams;
+    S.ppTeam   = cfg.ppTeam;
+    S.bestN    = cfg.bestN;
+    S.teams    = cfg.teams;
+    document.getElementById('numTeams').value = S.numTeams;
+    document.getElementById('ppTeam').value   = S.ppTeam;
+    document.getElementById('bestN').value    = S.bestN;
+    if (cfg.tournament) {
+      document.getElementById('tournamentInput').value = cfg.tournament;
+      document.title = '⛳ ' + cfg.tournament;
+    }
+    buildTeamInputs();
+    S.teams.forEach((name, i) => {
+      const el = document.getElementById('tn' + i);
+      if (el && name) el.value = name;
+    });
+  } else {
+    buildTeamInputs();
+  }
+
+  // Step 2: Load leaderboard
+  await loadLeaderboard();
+
+  // Step 3: Restore picks from Sheets
+  await loadPicksFromSheet();
+});
+
+function buildTeamInputs() {
+  const n = parseInt(document.getElementById('numTeams').value) || 4;
+  const row = document.getElementById('teamNamesRow');
+  const old = [];
+  for (let i=0;i<12;i++){const e=document.getElementById('tn'+i);old.push(e?e.value:'');}
+  row.innerHTML='';
+  for(let i=0;i<n;i++){
+    const v=old[i]||S.teams[i]||'Team '+(i+1);
+    const d=document.createElement('div');d.className='tnf';
+    d.innerHTML='<label>Team '+(i+1)+'</label><input type="text" id="tn'+i+'" value="'+esc(v)+'" placeholder="Team '+(i+1)+'">';
+    row.appendChild(d);
+  }
+}
+
+/* ═══════════════════════════════════════
+   APPS SCRIPT URL
+═══════════════════════════════════════ */
+function saveAppsScriptUrl() {
+  const url = document.getElementById('appsScriptUrl').value.trim();
+  const okEl  = document.getElementById('scriptUrlOk');
+  const errEl = document.getElementById('scriptUrlErr');
+  okEl.classList.add('hidden'); errEl.classList.add('hidden');
+  if (!url || !url.includes('script.google.com')) {
+    errEl.textContent = 'Please paste a valid Apps Script Web App URL.';
+    errEl.classList.remove('hidden'); return;
+  }
+  S.appsScriptUrl = url;
+  localStorage.setItem('golfDraft_appsScriptUrl', url);
+  okEl.textContent = '✓ URL saved — picks will now sync to Google Sheets automatically.';
+  okEl.classList.remove('hidden');
+  setSyncStatus('synced', 'Connected to Google Sheets via Apps Script');
+  // Load any existing picks from the sheet
+  loadPicksFromSheet();
+}
+
+/* ═══════════════════════════════════════
+   LOAD LEADERBOARD (Google Sheets CSV)
+═══════════════════════════════════════ */
+async function loadLeaderboard(){
+  const url=document.getElementById('csvUrl').value.trim();
+  const errEl=document.getElementById('loadErr');
+  const okEl=document.getElementById('loadOk');
+  errEl.classList.add('hidden'); okEl.classList.add('hidden');
+  if(!url){errEl.textContent='Please enter the CSV URL from Google Sheets.'; errEl.classList.remove('hidden'); return;}
+  document.getElementById('loadTxt').textContent='Loading…';
+  document.getElementById('loadSpin').classList.remove('hidden');
+  try{
+    const fetchUrl=ensureCsv(url);
+    const resp=await fetch(fetchUrl);
+    if(!resp.ok) throw new Error('HTTP '+resp.status+'. Make sure the sheet is published publicly.');
+    const text=await resp.text();
+    const {players,headers,rows,preTournament}=parseSheetsCSV(text);
+    if(!players.length) throw new Error('No players found. Check the sheet has IMPORTHTML data.');
+    S.lastCsvUrl=fetchUrl;
+    S.rawHeaders=headers;
+    S.rawRows=rows;
+    S.preTournament=preTournament;
+    applyPlayers(players);
+    startAutoRefresh();
+    okEl.textContent='✓ Loaded '+players.length+' players'+(preTournament?' (tee times — tournament not started yet).':'.');
+    okEl.classList.remove('hidden');
+  }catch(e){
+    console.error('Load failed:', e);
+    errEl.textContent='⚠ '+e.message+' (check browser console for details)';
+    errEl.classList.remove('hidden');
+  }finally{
+    document.getElementById('loadTxt').textContent='⚡ Load Leaderboard';
+    document.getElementById('loadSpin').classList.add('hidden');
+  }
+}
+
+function ensureCsv(url){
+  try{const u=new URL(url);u.searchParams.set('output','csv');return u.toString();}
+  catch(e){return url;}
+}
+
+/* ═══════════════════════════════════════
+   CSV PARSER
+═══════════════════════════════════════ */
+function parseSheetsCSV(text){
+  const allRows=parseCSV(text);
+  if(allRows.length<1) throw new Error('CSV is empty.');
+
+  // Debug: log first few rows to console
+  console.log('CSV rows received:', allRows.length);
+  console.log('First row:', allRows[0]);
+  if(allRows[1]) console.log('Second row:', allRows[1]);
+
+  // Find header row — scan first 5 rows, handle blank leading columns
+  let headerIdx=-1;
+  let colMap={pos:-1,name:-1,score:-1,thru:-1,today:-1,teeTime:-1};
+
+  for(let i=0;i<Math.min(5,allRows.length);i++){
+    const cols=allRows[i].map(c=>(c||'').trim().toUpperCase());
+    // Look for PLAYER column anywhere in the row
+    const ni=cols.findIndex(c=>c==='PLAYER'||c==='NAME'||c==='GOLFER'||c.includes('PLAYER'));
+    if(ni>=0){
+      headerIdx=i;
+      colMap.name=ni;
+      colMap.pos   =cols.findIndex(c=>c==='POS'||c==='POSITION'||c===' POS'||c==='#');
+      colMap.score =cols.findIndex(c=>c==='TO PAR'||c==='TOPAR'||c==='+/-'||c==='SCORE'||c==='TOT PAR'||c==='TOTAL');
+      colMap.thru  =cols.findIndex(c=>c==='THRU'||c==='HOLE'||c==='THRU*');
+      colMap.today =cols.findIndex(c=>c==='TODAY'||c==='RND'||c==='TODAY*');
+      colMap.teeTime=cols.findIndex(c=>c.includes('TEE')||c==='TIME');
+      console.log('Header found at row', i, '| colMap:', colMap);
+      break;
+    }
+  }
+
+  // If still no header, try treating first row as data (no header row)
+  if(headerIdx<0){
+    // Check if second column looks like player names (no numbers, has spaces)
+    const firstDataRow = allRows[0];
+    const col1 = (firstDataRow[1]||'').trim();
+    if(col1 && /^[A-Za-z]/.test(col1) && col1.includes(' ')){
+      console.log('No header found — assuming col 0=pos, col 1=name, col 2=score, col 3=thru, col 4=today');
+      headerIdx=-1; // no header
+      colMap={pos:0,name:1,score:2,thru:3,today:4,teeTime:-1};
+    } else {
+      throw new Error('Could not find PLAYER column in CSV. First row: ' + JSON.stringify(allRows[0]));
+    }
+  }
+
+  const headers = headerIdx>=0 ? allRows[headerIdx] : ['POS','PLAYER','SCORE','THRU','TODAY'];
+  const dataRows = allRows.slice(headerIdx+1);
+  const players=[];
+  const preTournament = colMap.score < 0;
+
+  dataRows.forEach((row,ri)=>{
+    if(!row||row.length<1) return;
+    const name=(row[colMap.name]||'').trim();
+    // Skip blank rows and re-headers
+    if(!name) return;
+    if(name.toUpperCase()==='PLAYER'||name.toUpperCase()==='NAME') return;
+
+    const posRaw   = colMap.pos>=0    ? (row[colMap.pos]   ||'').trim() : String(ri+1);
+    const scoreRaw = colMap.score>=0  ? (row[colMap.score] ||'').trim() : '';
+    const thruRaw  = colMap.thru>=0   ? (row[colMap.thru]  ||'').trim() : '';
+    const todayRaw = colMap.today>=0  ? (row[colMap.today] ||'').trim() : '';
+    const teeTime  = colMap.teeTime>=0? (row[colMap.teeTime]||'').trim(): '';
+
+    const cut=/^(CUT|MC|MDF|WD|DQ)$/i.test(scoreRaw)||/^(CUT|MC|WD|DQ)$/i.test(posRaw);
+    let score=0;
+    if(!cut && scoreRaw){
+      if(/^E$/i.test(scoreRaw)) score=0;
+      else score=parseInt(scoreRaw.replace('+',''))||0;
+    }
+    let today=null;
+    if(todayRaw&&!/^[-–]$/.test(todayRaw)){
+      if(/^E$/i.test(todayRaw)) today=0;
+      else today=parseInt(todayRaw.replace('+',''))||null;
+    }
+
+    players.push({
+      pos: posRaw||String(ri+1),
+      name,
+      score,
+      today,
+      thru: thruRaw||teeTime||'–',
+      cut,
+      teeTime,
+      preTournament,
+      rawRow: row
+    });
+  });
+
+  console.log('Players parsed:', players.length, players.slice(0,3));
+
+  if(!players.length) throw new Error(
+    'Parsed 0 players from '+allRows.length+' CSV rows. '+
+    'First data row: '+JSON.stringify(dataRows[0]||[])+'. '+
+    'Name column index: '+colMap.name
+  );
+  return {players, headers, rows:dataRows, preTournament};
+}
+
+function parseCSV(text){
+  const rows=[];let row=[],cell='',inQ=false;
+  const push=()=>{row.push(cell);cell='';};
+  for(let i=0;i<text.length;i++){
+    const c=text[i],n=text[i+1];
+    if(inQ){if(c==='"'&&n==='"'){cell+='"';i++;}else if(c==='"')inQ=false;else cell+=c;}
+    else{if(c==='"')inQ=true;else if(c===',')push();
+    else if(c==='\n'||(c==='\r'&&n==='\n')){push();if(row.some(x=>x.trim()))rows.push(row);row=[];if(c==='\r')i++;}
+    else if(c==='\r'){push();if(row.some(x=>x.trim()))rows.push(row);row=[];}
+    else cell+=c;}
+  }
+  push();if(row.some(x=>x.trim()))rows.push(row);
+  return rows;
+}
+
+/* ═══════════════════════════════════════
+   MANUAL ENTRY
+═══════════════════════════════════════ */
+function toggleManualInput(){document.getElementById('manualBox').classList.toggle('hidden');}
+
+function loadManual(){
+  const lines=document.getElementById('manualText').value.trim().split('\n').filter(l=>l.trim());
+  const players=[];
+  lines.forEach((line,i)=>{
+    const parts=line.split(',').map(s=>s.trim());
+    if(!parts[0])return;
+    const name=parts[0];
+    const rs=(parts[1]||'0').replace('+','');
+    const score=/^E$/i.test(rs)?0:(parseInt(rs)||0);
+    const thru=parts[2]||'–';
+    players.push({pos:String(i+1),name,score,today:null,thru,cut:false,rawRow:[String(i+1),name,rs,thru]});
+  });
+  if(!players.length){alert('No players found. Format: Name, Score, Thru');return;}
+  S.rawHeaders=['POS','PLAYER','SCORE','THRU'];
+  S.rawRows=players.map(p=>p.rawRow);
+  applyPlayers(players);
+}
+
+/* ═══════════════════════════════════════
+   APPLY PLAYERS
+═══════════════════════════════════════ */
+function applyPlayers(rawPlayers){
+  S.numTeams=parseInt(document.getElementById('numTeams').value)||4;
+  S.ppTeam=parseInt(document.getElementById('ppTeam').value)||6;
+  S.bestN=parseInt(document.getElementById('bestN').value)||4;
+
+  S.teams=[];
+  for(let i=0;i<S.numTeams;i++){
+    const e=document.getElementById('tn'+i);
+    S.teams.push(e?(e.value||'Team '+(i+1)):'Team '+(i+1));
+  }
+
+  // Preserve any existing in-memory picks across refreshes
+  const oldPicks={};
+  Object.keys(S.picks).forEach(ti=>{
+    (S.picks[ti]||[]).forEach(name=>{
+      oldPicks[name]=oldPicks[name]||[];
+      oldPicks[name].push(parseInt(ti));
+    });
+  });
+
+  // Only init empty picks for teams that don't exist yet
+  for(let i=0;i<S.numTeams;i++){
+    if(!S.picks[i]) S.picks[i]=[];
+  }
+
+  const active=rawPlayers.filter(p=>!p.cut).sort((a,b)=>(a.score||0)-(b.score||0));
+  const cut=rawPlayers.filter(p=>p.cut);
+  S.players=[...active,...cut];
+
+  // Re-apply old picks (preserves picks across score refreshes)
+  S.players.forEach(p=>{
+    const tis=oldPicks[p.name];
+    if(tis) tis.forEach(ti=>{
+      if(S.picks[ti] && !S.picks[ti].includes(p.name)) S.picks[ti].push(p.name);
+    });
+  });
+
+  document.getElementById('bestNNote').textContent=S.bestN;
+  document.getElementById('hdrMeta').innerHTML=
+    '<b>'+active.length+'</b> active &nbsp;·&nbsp; <b>'+cut.length+'</b> cut &nbsp;·&nbsp; '
+    +'<b>'+S.numTeams+'</b> teams &nbsp;·&nbsp; Best <b>'+S.bestN+'</b> count';
+  document.getElementById('lastUpdated').textContent=new Date().toLocaleTimeString();
+
+  // Rebuild board if already visible
+  if (!document.getElementById('draftBoardSection').classList.contains('hidden')) {
+    buildDraftInputs();
+  }
+  buildLeaderboard();
+  buildRawTable();
+}
+
+/* ═══════════════════════════════════════
+   DRAFT BOARD — vertical roster columns
+═══════════════════════════════════════ */
+function buildDraftInputs(){
+  const wrap = document.getElementById('draftInputGrid');
+  wrap.innerHTML = '';
+
+  // Outer wrapper for overflow scroll
+  const outerDiv = document.createElement('div');
+  outerDiv.className = 'roster-table-wrap';
+
+  const table = document.createElement('table');
+  table.className = 'roster-table';
+
+  // ── HEADER ROW ──
+  const thead = document.createElement('thead');
+  const headerRow = document.createElement('tr');
+  S.teams.forEach((name, ti) => {
+    const th = document.createElement('th');
+    th.id = 'rosterHead' + ti;
+    th.innerHTML = esc(name) + '<span class="pick-count" id="pickCount'+ti+'">0 / '+S.ppTeam+'</span>';
+    headerRow.appendChild(th);
+  });
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+
+  // ── BODY: one row per player slot ──
+  const tbody = document.createElement('tbody');
+  for (let slot = 0; slot < S.ppTeam; slot++) {
+    const tr = document.createElement('tr');
+    S.teams.forEach((_, ti) => {
+      const td = document.createElement('td');
+      td.id = 'slot_' + ti + '_' + slot;
+      td.innerHTML = renderSlotHTML(ti, slot);
+      tbody.appendChild = tbody.appendChild; // noop trick to keep ref
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  }
+
+  // ── SEARCH ROW at bottom ──
+  const searchRow = document.createElement('tr');
+  S.teams.forEach((_, ti) => {
+    const td = document.createElement('td');
+    td.innerHTML =
+      '<div class="slot-search-wrap">'
+      + '<input type="text" id="acInput'+ti+'" placeholder="+ Search player…" autocomplete="off"'
+      + ' oninput="acFilter('+ti+')" onfocus="acOpen('+ti+')" onblur="acBlur('+ti+')"'
+      + ' onkeydown="acKeydown(event,'+ti+')">'
+      + '<div class="autocomplete-dropdown" id="acDrop'+ti+'"></div>'
+      + '</div>';
+    searchRow.appendChild(td);
+  });
+  tbody.appendChild(searchRow);
+
+  table.appendChild(tbody);
+  outerDiv.appendChild(table);
+  wrap.appendChild(outerDiv);
+
+  // Now render actual slot contents
+  S.teams.forEach((_, ti) => refreshSlots(ti));
+}
+
+function renderSlotHTML(ti, slot){
+  const name = S.picks[ti] ? S.picks[ti][slot] : undefined;
+  const slotNum = '<span class="slot-num">'+(slot+1)+'</span>';
+  if (!name) {
+    return '<div class="slot-cell">'+slotNum+'<div class="slot-empty"></div></div>';
+  }
+  const p = S.players.find(pl => pl.name === name);
+  const sc = p ? (p.cut ? 'CUT' : fmtNum(p.score)) : '?';
+  const scClass = p && !p.cut ? (p.score<0?'sc-under':p.score>0?'sc-over':'sc-even') : 'sc-cut';
+
+  // Is this slot counting toward the score?
+  const pickedPlayers = (S.picks[ti]||[]).map(n=>S.players.find(pl=>pl.name===n)).filter(Boolean);
+  const valid = pickedPlayers.filter(p=>!p.cut).sort((a,b)=>(a.score||0)-(b.score||0));
+  const countingNames = new Set(valid.slice(0, S.bestN).map(p=>p.name));
+  const isCounting = countingNames.has(name);
+
+  return '<div class="slot-cell">'
+    + slotNum
+    + '<div class="slot-filled '+(isCounting?'counting':'')+'">'
+    + '<span class="slot-name">'+esc(name)+'</span>'
+    + '<span class="slot-score '+scClass+'">'+sc+'</span>'
+    + '</div>'
+    + '<button class="slot-rm" onmousedown="event.preventDefault();unpickPlayer('+ti+',\''+name.replace(/'/g,"\\'")+'\')">×</button>'
+    + '</div>';
+}
+
+function refreshSlots(ti){
+  // Re-render all slots for a team
+  for (let slot = 0; slot < S.ppTeam; slot++) {
+    const td = document.getElementById('slot_' + ti + '_' + slot);
+    if (td) td.innerHTML = renderSlotHTML(ti, slot);
+  }
+  const countEl = document.getElementById('pickCount' + ti);
+  if (countEl) countEl.textContent = (S.picks[ti]||[]).length + ' / ' + S.ppTeam;
+}
+
+function acFilter(ti){
+  const q=document.getElementById('acInput'+ti).value.toLowerCase().trim();
+  renderDropdown(ti,q);
+}
+
+function acOpen(ti){
+  const q=document.getElementById('acInput'+ti).value.toLowerCase().trim();
+  renderDropdown(ti,q);
+}
+
+function acBlur(ti){
+  setTimeout(()=>{
+    const d=document.getElementById('acDrop'+ti);
+    if(d)d.classList.remove('open');
+  },180);
+}
+
+function acKeydown(e,ti){
+  const drop=document.getElementById('acDrop'+ti);
+  if(!drop)return;
+  const items=drop.querySelectorAll('.ac-item:not(.already-picked)');
+  const sel=drop.querySelector('.ac-item.selected');
+  let idx=[...items].indexOf(sel);
+  if(e.key==='ArrowDown'){e.preventDefault();idx=Math.min(idx+1,items.length-1);items.forEach((el,i)=>el.classList.toggle('selected',i===idx));}
+  else if(e.key==='ArrowUp'){e.preventDefault();idx=Math.max(idx-1,0);items.forEach((el,i)=>el.classList.toggle('selected',i===idx));}
+  else if(e.key==='Enter'){e.preventDefault();const s=drop.querySelector('.ac-item.selected');if(s)s.click();}
+  else if(e.key==='Escape'){drop.classList.remove('open');}
+}
+
+function renderDropdown(ti,q){
+  const drop=document.getElementById('acDrop'+ti);
+  if(!drop)return;
+  const results=S.players.filter(p=>{
+    if(!q&&(S.picks[ti]||[]).length>=S.ppTeam)return false;
+    return !q||p.name.toLowerCase().includes(q);
+  }).slice(0,14);
+  if(!results.length){drop.classList.remove('open');return;}
+  drop.innerHTML='';
+  results.forEach(p=>{
+    const alreadyThisTeam=(S.picks[ti]||[]).includes(p.name);
+    const otherEntry=Object.entries(S.picks).find(([t,arr])=>parseInt(t)!==ti&&arr.includes(p.name));
+    const div=document.createElement('div');
+    div.className='ac-item'+(alreadyThisTeam?' already-picked':'');
+    const sc=p.cut?'CUT':fmtNum(p.score);
+    const scClass=p.cut?'sc-cut':p.score<0?'sc-under':p.score>0?'sc-over':'sc-even';
+    const onOther=otherEntry?'<span style="font-size:.7rem;color:var(--muted);"> ('+esc(S.teams[parseInt(otherEntry[0])])+')</span>':'';
+    div.innerHTML='<span class="ac-name">'+esc(p.name)+onOther+'</span>'
+      +'<span class="ac-score '+scClass+'">'+sc+(S.preTournament?' · '+esc(p.thru):'')+'</span>';
+    if(!alreadyThisTeam){
+      div.addEventListener('mousedown',e=>{
+        e.preventDefault();
+        pickPlayer(ti,p.name);
+        drop.classList.remove('open');
+        document.getElementById('acInput'+ti).value='';
+      });
+    }
+    drop.appendChild(div);
+  });
+  drop.classList.add('open');
+}
+
+function pickPlayer(ti,name){
+  if((S.picks[ti]||[]).length>=S.ppTeam){alert(S.teams[ti]+' already has '+S.ppTeam+' players.');return;}
+  if((S.picks[ti]||[]).includes(name))return;
+  S.picks[ti].push(name);
+  // Refresh all teams' slots (counting status may change)
+  S.teams.forEach((_,t)=>refreshSlots(t));
+  buildLeaderboard();
+  syncPicksToSheet();
+}
+
+function unpickPlayer(ti,name){
+  S.picks[ti]=(S.picks[ti]||[]).filter(n=>n!==name);
+  S.teams.forEach((_,t)=>refreshSlots(t));
+  buildLeaderboard();
+  syncPicksToSheet();
+}
+
+// Keep renderTags as a no-op for any legacy calls
+function renderTags(){}
+
+
+
+/* ═══════════════════════════════════════
+   LEADERBOARD
+═══════════════════════════════════════ */
+function buildLeaderboard(){
+  const results=S.teams.map((name,ti)=>{
+    const players=S.picks[ti].map(n=>S.players.find(p=>p.name===n)).filter(Boolean);
+    const valid=players.filter(p=>!p.cut).sort((a,b)=>(a.score||0)-(b.score||0));
+    const counting=valid.slice(0,S.bestN);
+    const bench=valid.slice(S.bestN);
+    const cutP=players.filter(p=>p.cut);
+    const total=counting.reduce((s,p)=>s+(p.score||0),0);
+    return{name,ti,counting,bench,cutP,total,n:players.length};
+  });
+  results.sort((a,b)=>{
+    if(!a.n&&!b.n)return 0;if(!a.n)return 1;if(!b.n)return-1;
+    return a.total-b.total;
+  });
+
+  const grid=document.getElementById('lbGrid');
+  grid.innerHTML='';
+  results.forEach((t,rank)=>{
+    const div=document.createElement('div');
+    div.className='lb-row'+(rank===0&&t.n>0?' first':'');
+    const sdsp=!t.n?'–':t.total===0?'E':t.total<0?String(t.total):'+'+t.total;
+    const scol=t.total<0?'#4ecb71':t.total>0?'#e06060':'var(--muted)';
+    let ph='';
+    t.counting.forEach(p=>{ph+='<span class="cnt">'+esc(p.name)+' ('+fmtNum(p.score)+')</span> ';});
+    t.bench.forEach(p=>{ph+='<span class="ncnt">'+esc(p.name)+' ('+fmtNum(p.score)+')</span> ';});
+    t.cutP.forEach(p=>{ph+='<span class="ncnt">'+esc(p.name)+' (CUT)</span> ';});
+    if(!ph)ph='<span style="color:var(--muted);font-style:italic;">No players selected</span>';
+    const medal=rank===0&&t.n>0?'🏆':(rank+1);
+    div.innerHTML='<div class="lb-rank">'+medal+'</div>'
+      +'<div class="lb-body"><div class="lb-name">'+esc(t.name)
+      +' <span style="font-size:.72rem;color:var(--muted);font-family:\'Source Sans 3\';">('+t.n+'/'+S.ppTeam+')</span></div>'
+      +'<div class="lb-players">'+ph+'</div></div>'
+      +'<div class="lb-score" style="color:'+scol+'">'+sdsp+'</div>';
+    grid.appendChild(div);
+  });
+}
+
+/* ═══════════════════════════════════════
+   RAW ESPN TABLE
+═══════════════════════════════════════ */
+function buildRawTable(){
+  if(!S.rawHeaders.length)return;
+
+  // If pre-tournament, show a friendly note
+  const noteEl = document.getElementById('autoRefreshNote');
+  if(S.preTournament){
+    noteEl.innerHTML = '<span style="color:var(--gold);">⏳ Tournament not started — showing tee times. Scores will appear once play begins.</span>';
+  } else {
+    noteEl.textContent = S.refreshInterval ? 'Auto-refresh every '+S.refreshInterval+'s' : '';
+  }
+
+  const thead=document.getElementById('rawHead');
+  thead.innerHTML='<tr>'+S.rawHeaders.map((h,i)=>'<th'+(i<=1?' class="lft"':'')+'>'+esc(String(h))+'</th>').join('')+'</tr>';
+
+  const nameToTeam={};
+  S.teams.forEach((tname,ti)=>{S.picks[ti].forEach(n=>{nameToTeam[n]=tname;});});
+
+  const tbody=document.getElementById('rawBody');
+  tbody.innerHTML='';
+  S.players.forEach(p=>{
+    const tr=document.createElement('tr');
+    const raw=p.rawRow||[p.pos,p.name,p.cut?'CUT':fmtNum(p.score),p.thru,p.today!=null?fmtNum(p.today):'–'];
+    let html=raw.map((cell,ci)=>{
+      let txt=esc(String(cell??''));
+      if(!S.preTournament && (ci===2||ci===4)){
+        const v=String(cell).trim();
+        if(/^-\d/.test(v))txt='<span class="sc-under">'+txt+'</span>';
+        else if(/^\+\d+$/.test(v))txt='<span class="sc-over">'+txt+'</span>';
+        else if(v==='0'||/^E$/i.test(v))txt='<span class="sc-even">E</span>';
+        else if(/^(CUT|WD|DQ|MC)$/i.test(v))txt='<span class="sc-cut">'+txt+'</span>';
+      }
+      return '<td>'+txt+'</td>';
+    }).join('');
+    const team=nameToTeam[p.name];
+    if(team){
+      // Insert dot after player name cell (index 1)
+      html=html.replace(/(<td>[^<]*<\/td>){1}/,m=>m.slice(0,-5)+' <span class="picked-indicator" title="'+esc(team)+'"></span></td>');
+    }
+    tr.innerHTML=html;
+    if(p.cut)tr.style.opacity='.5';
+    tbody.appendChild(tr);
+  });
+}
+
+function toggleRaw(){
+  const sec=document.getElementById('rawSection');
+  const btn=document.getElementById('rawToggleBtn');
+  const hidden=sec.classList.toggle('hidden');
+  btn.textContent=hidden?'▶ Show':'▼ Hide';
+}
+
+/* ═══════════════════════════════════════
+   SYNC PICKS → GOOGLE SHEETS (Apps Script)
+═══════════════════════════════════════ */
+async function syncPicksToSheet() {
+  if (!S.appsScriptUrl) {
+    setSyncStatus('', 'Picks saved locally — paste Apps Script URL to sync to Sheets');
+    return;
+  }
+  setSyncStatus('syncing', 'Syncing picks to Google Sheets…');
+  try {
+    const url = S.appsScriptUrl
+      + '?action=savePicks'
+      + '&picks=' + encodeURIComponent(JSON.stringify(S.picks))
+      + '&teams=' + encodeURIComponent(JSON.stringify(S.teams));
+    const resp = await fetch(url);
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error);
+    setSyncStatus('synced', 'Picks synced to Google Sheets ✓  ' + new Date().toLocaleTimeString());
+  } catch(e) {
+    setSyncStatus('error', 'Sync failed: ' + e.message);
+  }
+}
+
+async function loadPicksFromSheet() {
+  if (!S.appsScriptUrl || !S.players.length) return;
+  try {
+    const url = S.appsScriptUrl + '?action=getPicks';
+    const resp = await fetch(url);
+    const data = await resp.json();
+    if (data.error || !data.picks) return;
+
+    // Check if there are any picks to restore
+    const haspicks = Object.values(data.picks).some(arr => arr.length > 0);
+    if (!haspicks) return;
+
+    // Restore team count and names from the sheet
+    if (data.teams && data.teams.length) {
+      const n = data.teams.length;
+      // Update the numTeams input and rebuild team name inputs
+      document.getElementById('numTeams').value = n;
+      buildTeamInputs();
+      // Fill in team names
+      data.teams.forEach((name, i) => {
+        const el = document.getElementById('tn' + i);
+        if (el && name) el.value = name;
+      });
+    }
+
+    // Init picks object for the right number of teams
+    const numTeams = data.teams ? data.teams.length : S.numTeams;
+    for(let i=0;i<numTeams;i++) if(!S.picks[i]) S.picks[i]=[];
+
+    // Restore picks by player name
+    Object.entries(data.picks).forEach(([ti, names]) => {
+      const idx = parseInt(ti);
+      if (S.picks[idx] !== undefined) {
+        names.forEach(name => {
+          if (name && S.players.find(p=>p.name===name) && !S.picks[idx].includes(name)){
+            S.picks[idx].push(name);
+          }
+        });
+      }
+    });
+
+    // Auto-generate the board with restored picks
+    generateDraftBoard();
+    setSyncStatus('synced', 'Picks restored from Google Sheets ✓');
+  } catch(e) {
+    console.warn('Could not load picks from sheet:', e.message);
+  }
+}
+
+function setSyncStatus(state,msg){
+  const bar=document.getElementById('syncBar');
+  const dot=document.getElementById('syncDot');
+  const txt=document.getElementById('syncMsg');
+  bar.classList.remove('hidden');
+  dot.className='sync-dot '+(state||'');
+  txt.textContent=msg;
+}
+
+/* ═══════════════════════════════════════
+   AUTO REFRESH
+═══════════════════════════════════════ */
+function startAutoRefresh(){
+  clearInterval(S.refreshTimer);
+  S.refreshInterval=parseInt(document.getElementById('refreshInterval').value)||0;
+  if(!S.refreshInterval)return;
+  S.countdown=S.refreshInterval;
+  updateCountdown();
+  S.refreshTimer=setInterval(()=>{
+    S.countdown--;
+    updateCountdown();
+    if(S.countdown<=0){doRefresh();S.countdown=S.refreshInterval;}
+  },1000);
+  const badge=document.getElementById('autoRefreshBadge');
+  badge.style.display='flex';
+  document.getElementById('refreshTimer').classList.remove('hidden');
+  document.getElementById('autoRefreshNote').textContent='Auto-refresh every '+S.refreshInterval+'s';
+}
+
+function updateCountdown(){
+  const m=Math.floor(S.countdown/60);
+  const s=S.countdown%60;
+  const txt=m>0?m+'m '+s+'s':s+'s';
+  document.getElementById('refreshCountdown').textContent='Refresh in '+txt;
+  document.getElementById('refreshTimer').textContent='Next refresh: '+txt;
+}
+
+async function doRefresh(){
+  if(!S.lastCsvUrl)return;
+  try{
+    const resp=await fetch(S.lastCsvUrl+'&t='+Date.now());
+    if(!resp.ok)throw new Error('HTTP '+resp.status);
+    const text=await resp.text();
+    const{players,headers,rows,preTournament}=parseSheetsCSV(text);
+    if(!players.length)throw new Error('Empty');
+    S.rawHeaders=headers;S.rawRows=rows;S.preTournament=preTournament;
+    applyPlayers(players);
+    document.getElementById('lastUpdated').textContent=new Date().toLocaleTimeString();
+  }catch(e){console.warn('Refresh failed:',e.message);}
+}
+
+/* ═══════════════════════════════════════
+   UTILS
+═══════════════════════════════════════ */
+function resetAll(){
+  if(!confirm('Reset the entire draft board? This will clear all picks and settings and cannot be undone.')) return;
+  for(let i=0;i<S.numTeams;i++) S.picks[i]=[];
+  document.getElementById('draftBoardSection').classList.add('hidden');
+  buildLeaderboard();
+  if(S.players.length) buildRawTable();
+  if(S.appsScriptUrl){
+    fetch(S.appsScriptUrl + '?action=resetAll')
+      .then(()=>setSyncStatus('synced','Draft board reset — all picks and settings cleared.'))
+      .catch(e=>console.warn('Reset sheet error:',e));
+  }
+  window.scrollTo({top:0, behavior:'smooth'});
+  setSyncStatus('syncing','Resetting Google Sheets…');
+}
+
+function clearAllPicks(){
+  if(!confirm('Clear all picks?'))return;
+  for(let i=0;i<S.numTeams;i++)S.picks[i]=[];
+  buildDraftInputs();buildLeaderboard();buildRawTable();
+  syncPicksToSheet();
+}
+
+function fmtNum(score){
+  if(score==null)return'–';
+  if(score<0)return String(score);
+  if(score>0)return'+'+score;
+  return'E';
+}
+function updateTournamentTitle(){
+  const val = document.getElementById('tournamentInput').value.trim();
+  document.title = '⛳ ' + (val || 'Golf Draft');
+  // Save to Sheets if connected
+  if (S.appsScriptUrl) {
+    clearTimeout(S._tournamentSaveTimer);
+    S._tournamentSaveTimer = setTimeout(() => {
+      const settings = { tournament: val };
+      fetch(S.appsScriptUrl + '?action=saveSettings&settings=' + encodeURIComponent(JSON.stringify(settings)))
+        .catch(e => console.warn('Could not save tournament name:', e));
+    }, 800); // debounce — wait until user stops typing
+  }
+}
+
+function generateDraftBoard() {
+  // Read current settings from inputs
+  S.numTeams  = parseInt(document.getElementById('numTeams').value) || 4;
+  S.ppTeam    = parseInt(document.getElementById('ppTeam').value)   || 6;
+  S.bestN     = parseInt(document.getElementById('bestN').value)    || 4;
+  S.teams = [];
+  for (let i = 0; i < S.numTeams; i++) {
+    const el = document.getElementById('tn' + i);
+    S.teams.push(el ? (el.value.trim() || 'Team ' + (i+1)) : 'Team ' + (i+1));
+  }
+
+  // Save settings to Google Sheets Settings tab
+  const settingsObj = {
+    numTeams:   S.numTeams,
+    ppTeam:     S.ppTeam,
+    bestN:      S.bestN,
+    teams:      JSON.stringify(S.teams),
+    tournament: document.getElementById('tournamentInput').value.trim()
+  };
+  if (S.appsScriptUrl) {
+    fetch(S.appsScriptUrl + '?action=saveSettings&settings=' + encodeURIComponent(JSON.stringify(settingsObj)))
+      .catch(e => console.warn('Could not save settings to sheet:', e));
+  }
+
+  // Preserve existing picks across regeneration
+  const oldPicks = {};
+  Object.keys(S.picks).forEach(ti => {
+    (S.picks[ti] || []).forEach(n => { oldPicks[n] = oldPicks[n] || []; oldPicks[n].push(parseInt(ti)); });
+  });
+  for (let i = 0; i < S.numTeams; i++) if (!S.picks[i]) S.picks[i] = [];
+  S.players.forEach(p => {
+    const tis = oldPicks[p.name];
+    if (tis) tis.forEach(ti => { if (S.picks[ti] !== undefined && !S.picks[ti].includes(p.name)) S.picks[ti].push(p.name); });
+  });
+
+  document.getElementById('bestNNote').textContent = S.bestN;
+  document.getElementById('draftCardSub').textContent = '— type a name to search and assign players';
+  document.getElementById('syncBar').classList.remove('hidden');
+  document.getElementById('draftBoardSection').classList.remove('hidden');
+
+  buildDraftInputs();
+  buildLeaderboard();
+  if (S.players.length) buildRawTable();
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function esc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function showErr(id,msg){const e=document.getElementById(id);e.textContent=msg;e.classList.remove('hidden');}
+</script>
+</body>
+</html>
